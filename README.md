@@ -15,3 +15,6 @@ sudo sysctl -w vm.max_map_count=262144
 sudo service docker start
 cd /mnt/c/MyProjects/elk && sudo docker compose up
 ```
+
+# Access Kibana
+http://localhost:5601/
