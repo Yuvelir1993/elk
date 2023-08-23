@@ -60,6 +60,9 @@ services:
       - esdata01:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+      - 8200:8200
+    networks:
+      - elk
     environment:
       - node.name=es01
       - cluster.name=es-cluster
@@ -102,6 +105,8 @@ services:
       - kibanadata:/usr/share/kibana/data
     ports:
       - 5601:5601
+    networks:
+      - elk
     environment:
       - SERVERNAME=kibana
       - ELASTICSEARCH_HOSTS=https://es01:9200
@@ -126,3 +131,6 @@ volumes:
     driver: local
   kibanadata:
     driver: local
+networks:
+  elk:
+    external: true

@@ -1,0 +1,55 @@
+receivers:
+    otlp:
+        protocols:
+            http:
+            grpc:
+
+exporters:
+    logging:
+        loglevel: debug
+    jaeger:
+        endpoint: jaeger-all-in-one:14250
+        tls:
+            insecure: true
+    elasticsearch/trace:
+        endpoints: [https://es01:8200]
+        headers:
+            # Elastic APM Server secret token
+            Authorization: "Bearer ThisIsMySecretToken123++"
+        tls:
+            insecure: true
+    otlp/elastic: 
+        # Elastic APM server https endpoint without the "https://" prefix
+        endpoint: es01:8200
+        headers:
+            # Elastic APM Server secret token
+            Authorization: "Bearer ThisIsMySecretToken123++"
+        tls:
+            insecure: true
+
+processors:
+    memory_limiter:
+        check_interval: 1s
+        limit_mib: 2000
+    batch:
+
+extensions:
+    health_check:
+    pprof:
+    zpages:
+        endpoint: 0.0.0.0:55679
+
+service:
+    extensions: [health_check, pprof, zpages]
+    pipelines:
+        traces:
+            receivers: [otlp]
+            exporters: [jaeger]
+            processors: [memory_limiter, batch]
+        metrics:
+            receivers: [otlp]
+            exporters: [logging]
+            processors: [batch]
+        logs:
+            receivers: [otlp]
+            exporters: [logging]
