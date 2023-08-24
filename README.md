@@ -19,7 +19,6 @@ ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1
 # Start ELK
 ```bash
 sudo service docker start
-sudo docker network create elk
 cd /mnt/c/MyProjects/elk && sudo docker compose up
 ```
 ## Access Kibana
