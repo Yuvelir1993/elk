@@ -6,6 +6,11 @@
 Please remember that OpenTelemetry doesn't store any data (traces, metrics, logs). It has concept of exporters, where data are exported to user selected data (trace, metric, log) storage (3rd party). 
 OpenTelemetry is "middle layer", where you can switch to another storage easily.
 
+## APM server
+Elastic agent is installed at '/opt/Elastic/Agent' by default and should be run as a service.
+
+[Run APM Server on Docker](https://www.elastic.co/guide/en/apm/guide/current/running-on-docker.html)
+
 ## Pre requisites
 ### Prepare Linux
 ```bash

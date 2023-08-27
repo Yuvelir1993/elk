@@ -2,9 +2,9 @@ receivers:
     otlp:
         protocols:
             http:
-                endpoint: '172.29.17.18:4318'
+                # endpoint: '172.29.17.18:4318'
             grpc:
-                endpoint: '172.29.17.18:4317'
+                # endpoint: '172.29.17.18:4317'
 
 exporters:
     logging:
@@ -22,12 +22,12 @@ exporters:
     #         insecure: true
     otlp/elastic: 
         # Elastic APM server https endpoint without the "https://" prefix
-        endpoint: "0.0.0.0:8200"
+        endpoint: "localhost:8200"
         headers:
             # Elastic APM Server secret token
-            Authorization: "Bearer ThisIsMySecretToken123++"
-        tls:
-            insecure: true
+            Authorization: "Bearer AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2OTMxNDgwMjE4MjY6QUE4Z3RsVVhSUFNRelp5VHdQcm91dw"
+        # tls:
+        #     insecure: true
 
 processors:
     memory_limiter:

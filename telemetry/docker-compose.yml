@@ -5,6 +5,8 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
+    networks:
+      - telemetry
     user: root
     command: >
       bash -c '
@@ -24,9 +26,9 @@ services:
           echo "Creating certs";
           echo -ne \
           "instances:\n"\
-          "  - name: es01\n"\
+          "  - name: elasticsearch\n"\
           "    dns:\n"\
-          "      - es01\n"\
+          "      - elasticsearch\n"\
           "      - localhost\n"\
           "    ip:\n"\
           "      - 127.0.0.1\n"\
@@ -39,18 +41,19 @@ services:
         find . -type d -exec chmod 750 \{\} \;;
         find . -type f -exec chmod 640 \{\} \;;
         echo "Waiting for Elasticsearch availability";
-        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+        until curl -s --cacert config/certs/ca/ca.crt https://elasticsearch:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
         echo "Setting kibana_system password";
-        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
         echo "All done!";
       '
     healthcheck:
-      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+      test: ["CMD-SHELL", "[ -f config/certs/elasticsearch/elasticsearch.crt ]"]
       interval: 1s
       timeout: 5s
       retries: 120
 
-  es01:
+  elasticsearch:
+    container_name: elasticsearch
     depends_on:
       setup:
         condition: service_healthy
@@ -58,27 +61,29 @@ services:
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - esdata01:/usr/share/elasticsearch/data
+    networks:
+      - telemetry
     ports:
       - 9200:9200
       - 9300:9300
     environment:
-      - node.name=es01
+      - node.name=elasticsearch
       - cluster.name=es-cluster
-      - cluster.initial_master_nodes=es01
+      - cluster.initial_master_nodes=elasticsearch
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - bootstrap.memory_lock=true
       - xpack.security.enabled=true
       - xpack.security.http.ssl.enabled=true
-      - xpack.security.http.ssl.key=certs/es01/es01.key
-      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.http.ssl.key=certs/elasticsearch/elasticsearch.key
+      - xpack.security.http.ssl.certificate=certs/elasticsearch/elasticsearch.crt
       - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.enabled=true
-      - xpack.security.transport.ssl.key=certs/es01/es01.key
-      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.transport.ssl.key=certs/elasticsearch/elasticsearch.key
+      - xpack.security.transport.ssl.certificate=certs/elasticsearch/elasticsearch.crt
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
-      - xpack.license.self_generated.type=basic
-    mem_limit: "1024M"
+      - xpack.license.self_generated.type=trial
+    mem_limit: "1512M"
     ulimits:
       memlock:
         soft: -1
@@ -93,45 +98,22 @@ services:
       timeout: 10s
       retries: 120
 
-  # elastic-apm:
-  #   container_name: elastic-apm
-  #   build:
-  #     context: ../
-  #     dockerfile: ./build/elastic-apm/Dockerfile
-  #   ports:
-  #     - 8200:8200
-  #   cap_drop:
-  #     - ALL
-  #   cap_add:
-  #     - CHOWN
-  #     - DAC_OVERRIDE
-  #     - SETGID
-  #     - SETUID
-  #   depends_on:
-  #     elasticsearch:
-  #       condition: service_healthy
-  #     kibana:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     interval: 10s
-  #     retries: 12
-  #     test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
-  #   networks:
-  #     - opentelemetry
-
   kibana:
+    container_name: kibana
     depends_on:
-      es01:
+      elasticsearch:
         condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     volumes:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
+    networks:
+      - telemetry
     ports:
       - 5601:5601
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=https://es01:9200
+      - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
@@ -146,11 +128,37 @@ services:
       timeout: 10s
       retries: 120
 
+  elastic-apm:
+    container_name: elastic-apm
+    image: docker.elastic.co/apm/apm-server:${STACK_VERSION}
+    ports:
+      - 8200:8200
+    user: root
+    volumes:
+      - ./apm-server/apm-server.yml:/usr/share/apm-server/apm-server.yml:rw
+      - certs:/usr/share/apm-server/config/certs
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+    healthcheck:
+      interval: 10s
+      retries: 12
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
+    networks:
+      - telemetry
+
   otel-collector:
-    image: otel/opentelemetry-collector-contrib
-    command: [--config=/etc/otel-collector-config.yaml]
+    container_name: otel-collector
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    image: otel/opentelemetry-collector-contrib    
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    networks:
+      - telemetry
     ports:
       - 1888:1888 # pprof extension
       - 8888:8888 # Prometheus metrics exposed by the collector
@@ -159,9 +167,6 @@ services:
       - 4317:4317 # OTLP gRPC receiver
       - 4318:4318 # OTLP http receiver
       - 55679:55679 # zpages extension
-      # - 9200:9200 # elk
-      # - 9300:9300 # elk
-      # - 8200:8200 # elk
       
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -177,6 +182,8 @@ services:
       - "14268:14268"
       - "14250:14250"
       - "9411:9411"
+    networks:
+      - telemetry
 
 volumes:
   certs:
@@ -185,3 +192,7 @@ volumes:
     driver: local
   kibanadata:
     driver: local
+
+networks:
+  telemetry:
+    driver: bridge 
