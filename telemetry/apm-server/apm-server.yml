@@ -330,7 +330,7 @@ output.elasticsearch:
   hosts: ["elasticsearch:9200"]
 
   # Boolean flag to enable or disable the output module.
-  enabled: true
+  enabled: false
 
   # Set gzip compression level.
   #compression_level: 0
@@ -444,15 +444,15 @@ output.elasticsearch:
     #escape_html: false
 
 #---------------------------- Logstash output -----------------------------
-#output.logstash:
+output.logstash:
   # Boolean flag to enable or disable the output module.
-  #enabled: false
+  enabled: true
 
   # The Logstash hosts.
-  #hosts: ["localhost:5044"]
+  hosts: ["localhost:5044"]
 
   # Number of workers per Logstash host.
-  #worker: 1
+  worker: 1
 
   # Set gzip compression level.
   #compression_level: 3
