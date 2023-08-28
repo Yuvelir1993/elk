@@ -128,7 +128,6 @@ services:
       - xpack.monitoring.enabled=false
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - LS_JAVA_OPTS="-Xmx2g -Xms1g"
     mem_limit: 3g
     networks:
       - telemetry
@@ -186,43 +185,43 @@ services:
     networks:
       - telemetry
 
-  otel-collector:
-    container_name: otel-collector
-    restart: always
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    image: otel/opentelemetry-collector-contrib    
-    volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    networks:
-      - telemetry
-    ports:
-      - 1888:1888 # pprof extension
-      - 8888:8888 # Prometheus metrics exposed by the collector
-      - 8889:8889 # Prometheus exporter metrics
-      - 13133:13133 # health_check extension
-      - 4317:4317 # OTLP gRPC receiver
-      - 4318:4318 # OTLP http receiver
-      - 55679:55679 # zpages extension
+  # otel-collector:
+  #   container_name: otel-collector
+  #   restart: always
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+  #   image: otel/opentelemetry-collector-contrib    
+  #   volumes:
+  #     - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+  #   networks:
+  #     - telemetry
+  #   ports:
+  #     - 1888:1888 # pprof extension
+  #     - 8888:8888 # Prometheus metrics exposed by the collector
+  #     - 8889:8889 # Prometheus exporter metrics
+  #     - 13133:13133 # health_check extension
+  #     - 4317:4317 # OTLP gRPC receiver
+  #     - 4318:4318 # OTLP http receiver
+  #     - 55679:55679 # zpages extension
       
-  jaeger:
-    container_name: jaeger-all-in-one
-    restart: always
-    image: jaegertracing/all-in-one:latest
-    environment:
-      COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
-    ports:
-      - "5775:5775/udp"
-      - "6831:6831/udp"
-      - "6832:6832/udp"
-      - "5778:5778"
-      - "16686:16686"
-      - "14268:14268"
-      - "14250:14250"
-      - "9411:9411"
-    networks:
-      - telemetry
+  # jaeger:
+  #   container_name: jaeger-all-in-one
+  #   restart: always
+  #   image: jaegertracing/all-in-one:latest
+  #   environment:
+  #     COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
+  #   ports:
+  #     - "5775:5775/udp"
+  #     - "6831:6831/udp"
+  #     - "6832:6832/udp"
+  #     - "5778:5778"
+  #     - "16686:16686"
+  #     - "14268:14268"
+  #     - "14250:14250"
+  #     - "9411:9411"
+  #   networks:
+  #     - telemetry
 
 volumes:
   certs:

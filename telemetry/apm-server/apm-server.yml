@@ -330,7 +330,7 @@ output.elasticsearch:
   hosts: ["elasticsearch:9200"]
 
   # Boolean flag to enable or disable the output module.
-  enabled: false
+  enabled: true
 
   # Set gzip compression level.
   #compression_level: 0
