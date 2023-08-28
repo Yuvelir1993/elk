@@ -322,26 +322,26 @@ apm-server:
 # Configure the output to use when sending the data collected by apm-server.
 
 #-------------------------- Elasticsearch output --------------------------
-# output.elasticsearch:
+output.elasticsearch:
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (`http` and `9200`).
   # In case you specify and additional path, the scheme is required: `http://elasticsearch:9200/path`.
   # IPv6 addresses should always be defined as: `https://[2001:db8::1]:9200`.
-  # hosts: ["elasticsearch:9200"]
+  hosts: ["elasticsearch:9200"]
 
   # Boolean flag to enable or disable the output module.
-  # enabled: true
+  enabled: true
 
   # Set gzip compression level.
   #compression_level: 0
 
   # Protocol - either `http` (default) or `https`.
-  # protocol: "https"
+  protocol: "https"
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  # username: "elastic"
-  # password: "Password123++"
+  username: "elastic"
+  password: "Password123++"
 
   # Optional HTTP Path.
   #path: "/elasticsearch"
@@ -356,7 +356,7 @@ apm-server:
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
   # dropped. The default is 3.
-  #max_retries: 3
+  max_retries: 3
 
   # The number of seconds to wait before trying to reconnect to Elasticsearch
   # after a network error. After waiting backoff.init seconds, apm-server
@@ -381,7 +381,7 @@ apm-server:
   #flush_interval: 1s
 
   # Enable custom SSL settings. Set to false to ignore custom SSL settings for secure communication.
-  # ssl.enabled: true
+  ssl.enabled: true
 
   # Optional SSL configuration options. SSL is off by default, change the `protocol` option if you want to enable `https`.   
   #
@@ -407,13 +407,13 @@ apm-server:
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
   # List of root certificates for HTTPS server verifications.
-  # ssl.certificate_authorities: ["config/certs/ca/ca.crt"]
+  ssl.certificate_authorities: ["config/certs/ca/ca.crt"]
 
   # Certificate for SSL client authentication.
-  # ssl.certificate: "config/certs/elasticsearch/elasticsearch.crt"
+  ssl.certificate: "config/certs/elasticsearch/elasticsearch.crt"
 
   # Client Certificate Key
-  # ssl.key: "config/certs/elasticsearch/elasticsearch.key"
+  ssl.key: "config/certs/elasticsearch/elasticsearch.key"
 
   # Optional passphrase for decrypting the Certificate Key.
   # It is recommended to use the provided keystore instead of entering the passphrase in plain text.
@@ -444,12 +444,12 @@ apm-server:
     #escape_html: false
 
 #---------------------------- Logstash output -----------------------------
-output.logstash:
+# output.logstash:
   # Boolean flag to enable or disable the output module.
-  enabled: true
+  # enabled: true
 
   # The Logstash hosts.
-  hosts: ["localhost:5044"]
+  # hosts: ["localhost:5044"]
 
   # Number of workers per Logstash host.
   # worker: 1
