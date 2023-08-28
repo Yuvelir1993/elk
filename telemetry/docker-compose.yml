@@ -54,10 +54,11 @@ services:
 
   elasticsearch:
     container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    restart: always
     depends_on:
       setup:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - esdata01:/usr/share/elasticsearch/data
@@ -98,12 +99,47 @@ services:
       timeout: 10s
       retries: 120
 
-  kibana:
-    container_name: kibana
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
+    restart: always
     depends_on:
       elasticsearch:
         condition: service_healthy
+    ports:
+      - "5042:5042"
+      - "5044:5044"
+      - "5046:5046"
+    command: bin/logstash --config.reload.automatic
+    user: root:root
+    volumes:
+      - certs:/usr/share/logstash/config/certs:rw
+      - logstashdata:/usr/share/logstash/data
+      - type: bind
+        source: ./logstash/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+      - type: bind
+        source: ./logstash/pipelines.yml
+        target: /usr/share/logstash/config/pipelines.yml
+      - type: bind
+        source: ./logstash/pipelines
+        target: /usr/share/logstash/config/pipelines
+    environment:
+      - xpack.monitoring.enabled=false
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - LS_JAVA_OPTS="-Xmx2g -Xms1g"
+    mem_limit: 3g
+    networks:
+      - telemetry
+
+  kibana:
+    container_name: kibana
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    restart: always
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     volumes:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
@@ -131,17 +167,18 @@ services:
   elastic-apm:
     container_name: elastic-apm
     image: docker.elastic.co/apm/apm-server:${STACK_VERSION}
+    restart: always
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
     ports:
       - 8200:8200
     user: root
     volumes:
       - ./apm-server/apm-server.yml:/usr/share/apm-server/apm-server.yml:rw
       - certs:/usr/share/apm-server/config/certs
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      kibana:
-        condition: service_healthy
     healthcheck:
       interval: 10s
       retries: 12
@@ -151,6 +188,7 @@ services:
 
   otel-collector:
     container_name: otel-collector
+    restart: always
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -169,8 +207,9 @@ services:
       - 55679:55679 # zpages extension
       
   jaeger:
-    image: jaegertracing/all-in-one:latest
     container_name: jaeger-all-in-one
+    restart: always
+    image: jaegertracing/all-in-one:latest
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
     ports:
@@ -191,6 +230,8 @@ volumes:
   esdata01:
     driver: local
   kibanadata:
+    driver: local
+  logstashdata:
     driver: local
 
 networks:

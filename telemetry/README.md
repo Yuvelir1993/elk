@@ -2,6 +2,7 @@
 [Send telemetry to an OpenTelemetry Collector](https://opentelemetry.io/docs/instrumentation/python/getting-started/#send-telemetry-to-an-opentelemetry-collector)
 
 [Install Elasticsearch with Docker](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker)
+[Getting started with the Elastic Stack and Docker-Compose](https://www.elastic.co/blog/getting-started-with-the-elastic-stack-and-docker-compose)
 
 Please remember that OpenTelemetry doesn't store any data (traces, metrics, logs). It has concept of exporters, where data are exported to user selected data (trace, metric, log) storage (3rd party). 
 OpenTelemetry is "middle layer", where you can switch to another storage easily.
