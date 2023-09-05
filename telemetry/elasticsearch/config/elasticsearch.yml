@@ -1,0 +1,40 @@
+network.host: 0.0.0.0
+
+#----------------------- BEGIN SECURITY AUTO CONFIGURATION -----------------------
+#
+# The following settings, TLS certificates, and keys have been automatically
+# generated to configure Elasticsearch security features on 14-06-2022 09:11:48
+#
+# --------------------------------------------------------------------------------
+
+# Enable security features
+ingest.geoip.downloader.enabled: false
+xpack.security.enabled: true
+xpack.security.enrollment.enabled: true
+xpack.license.self_generated.type: trial
+
+# Enable encryption for HTTP API client connections, such as Kibana, Logstash, and Agents
+xpack.security.http.ssl:
+  enabled: true
+  key: certs/elasticsearch/elasticsearch.key
+  certificate: certs/elasticsearch/elasticsearch.crt
+  certificate_authorities: certs/ca/ca.crt
+  verification_mode: certificate
+
+# Enable encryption and mutual authentication between cluster nodes
+xpack.security.transport.ssl:
+  enabled: true
+  verification_mode: certificate
+  key: certs/elasticsearch/elasticsearch.key
+  certificate: certs/elasticsearch/elasticsearch.crt
+  certificate_authorities: certs/ca/ca.crt
+
+path.repo: [ "/usr/share/elasticsearch/snapshots" ]
+
+#----------------------- END SECURITY AUTO CONFIGURATION -------------------------
+cluster.name: elk-docker-single-node-cluster
+discovery.type: single-node
+bootstrap.memory_lock: true
+
+node.name: single-elasticsearch-node
+node.roles: [master, data, ingest, ml]

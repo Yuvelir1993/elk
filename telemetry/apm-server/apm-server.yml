@@ -9,12 +9,12 @@ apm-server:
   # Agent authorization configuration. If no methods are defined, all requests will be allowed.
   auth:
     # Agent authorization using Elasticsearch API Keys.
-    #api_key:
-      #enabled: false
+    api_key:
+      enabled: true
       #
       # Restrict how many unique API keys are allowed per minute. Should be set to at least the amount of different
       # API keys configured in your monitored services. Every unique API key triggers one request to Elasticsearch.
-      #limit: 100
+      # limit: 100
 
     # Define a shared secret token for authorizing agents using the "Bearer" authorization method.
     secret_token: AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2OTMxNDgwMjE4MjY6QUE4Z3RsVVhSUFNRelp5VHdQcm91dw
@@ -218,7 +218,7 @@ apm-server:
       protocol: "https"
 
       # Authentication credentials - either API key or username/password.
-      #api_key: "id:api_key"
+      # api_key: "id:api_key"
       username: "elastic"
       password: "Password123++"
 
@@ -327,7 +327,7 @@ output.elasticsearch:
   # Scheme and port can be left out and will be set to the default (`http` and `9200`).
   # In case you specify and additional path, the scheme is required: `http://elasticsearch:9200/path`.
   # IPv6 addresses should always be defined as: `https://[2001:db8::1]:9200`.
-  hosts: ["elasticsearch:9200"]
+  hosts: ["https://elasticsearch:9200"]
 
   # Boolean flag to enable or disable the output module.
   enabled: true
@@ -400,7 +400,7 @@ output.elasticsearch:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  #ssl.verification_mode: full
+  ssl.verification_mode: certificate
 
   # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
   # 1.2 are enabled.
