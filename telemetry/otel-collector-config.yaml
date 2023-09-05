@@ -48,7 +48,7 @@ exporters:
         endpoint: "localhost:8200"
         headers:
             # Elastic APM Server secret token
-            Authorization: "Bearer AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2OTMxNDgwMjE4MjY6QUE4Z3RsVVhSUFNRelp5VHdQcm91dw"
+            Authorization: "Bearer ${APM_TOKEN}"
         # tls:
         #     insecure: true
 

@@ -1,4 +1,6 @@
 .idea/
+.vscode
+node_modules
 
 ############################## PYTHON ##############################
 # Byte-compiled / optimized Python files

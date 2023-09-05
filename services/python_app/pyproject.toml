@@ -1,15 +1,16 @@
 [tool.poetry]
-name = "python-telemetry"
+name = "python-app"
 version = "0.1.0"
 description = ""
 authors = ["plozovik <Pavlo.Lozovikov@boc-pl.com>"]
-packages = [{ include = "python_telemetry" }]
+packages = [{ include = "python_app" }]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9.13"
-elastic-apm = "6.18.0"
-flask = "2.0.0"
+elastic-apm = "^6.18.0"
+flask = "^2.3.3"
+requests = "^2.31.0"
 
 [build-system]
 requires = ["poetry-core"]
