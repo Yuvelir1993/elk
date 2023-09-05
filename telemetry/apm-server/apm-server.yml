@@ -220,7 +220,7 @@ apm-server:
       # Authentication credentials - either API key or username/password.
       # api_key: "id:api_key"
       username: "elastic"
-      password: "Password123++"
+      password: "${ELASTIC_PASSWORD}"
 
   kibana:
     # Required when `apm-server.agent.config.elasticsearch` is not set AND `output.elasticsearch`
@@ -236,7 +236,7 @@ apm-server:
     # protocol: "https"
     protocol: "http"
     username: "elastic"
-    password: "Password123++"
+    password: "${ELASTIC_PASSWORD}"
 
     # Optional authentication with an API key
     #api_key: "id:api_key"
@@ -341,7 +341,7 @@ output.elasticsearch:
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
   username: "elastic"
-  password: "Password123++"
+  password: "${ELASTIC_PASSWORD}"
 
   # Optional HTTP Path.
   #path: "/elasticsearch"
