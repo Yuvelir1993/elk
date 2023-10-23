@@ -12,6 +12,9 @@ Elastic agent is installed at '/opt/Elastic/Agent' by default and should be run 
 
 [Run APM Server on Docker](https://www.elastic.co/guide/en/apm/guide/current/running-on-docker.html)
 
+### Kibana configuration
+Add token and tls certificate + key for tls which you can find in the apm-server.yml.
+
 ## Pre requisites
 ### Prepare Linux
 ```bash
