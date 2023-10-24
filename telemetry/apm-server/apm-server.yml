@@ -234,7 +234,7 @@ apm-server:
 
     # Optional protocol and basic auth credentials.
     # protocol: "https"
-    protocol: "https"
+    protocol: "http"
     username: "elastic"
     password: "${ELASTIC_PASSWORD}"
 
@@ -245,7 +245,7 @@ apm-server:
     #path: ""
 
     # Enable custom SSL settings. Set to false to ignore custom SSL settings for secure communication.
-    ssl.enabled: true
+    # ssl.enabled: true
 
     # Optional SSL configuration options. SSL is off by default, change the `protocol` option if you want to enable `https`. 
     #
@@ -268,16 +268,16 @@ apm-server:
 
     # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
     # 1.2 are enabled.
-    ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+    # ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
     # List of root certificates for HTTPS server verifications.
-    ssl.certificate_authorities: ["/config/certs/ca/ca.crt"]
+    # ssl.certificate_authorities: ["/config/certs/ca/ca.crt"]
 
     # Certificate for SSL client authentication.
-    ssl.certificate: "/run/secrets/kibana.crt"
+    # ssl.certificate: "/run/secrets/kibana.crt"
 
     # Client Certificate Key
-    ssl.key: "/run/secrets/kibana.key"
+    # ssl.key: "/run/secrets/kibana.key"
 
     # Optional passphrase for decrypting the Certificate Key.
     # It is recommended to use the provided keystore instead of entering the passphrase in plain text.
