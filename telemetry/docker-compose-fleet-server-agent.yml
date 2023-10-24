@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  elastic-agent:
+    container_name: elastic-agent
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+    restart: always
+    user: root
+    environment:
+      - ELASTICSEARCH_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
+      - ELASTICSEARCH_HOST=https://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+      - KIBANA_HOST=https://kibana:5601
+      - KIBANA_USERNAME=elastic
+      - KIBANA_PASSWORD=${ELASTIC_PASSWORD}
+      - KIBANA_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
+      - KIBANA_FLEET_SETUP=true
+      - KIBANA_FLEET_HOST=https://kibana:5601
+      - KIBANA_FLEET_USERNAME=elastic
+      - KIBANA_FLEET_PASSWORD=${ELASTIC_PASSWORD}
+      - FLEET_SERVER_ENABLE=true
+      - FLEET_SERVER_ELASTICSEARCH_HOST=https://elasticsearch:9200
+      - FLEET_SERVER_ELASTICSEARCH_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
+      - FLEET_SERVER_SERVICE_TOKEN=${FLEET_SERVER_SERVICE_TOKEN}
+      - FLEET_SERVER_HOST=elastic-agent
+      - FLEET_SERVER_PORT=8220
+      - FLEET_SERVER_CERT=/run/secrets/fleet-server.crt
+      - FLEET_SERVER_CERT_KEY=/run/secrets/fleet-server.key
+      - FLEET_SERVER_CERT_KEY_PASSPHRASE=/run/secrets/fleet-server-passphrase
+      - ELASTIC_AGENT_TAGS=self-managed,monitoring
+      - FLEET_ENROLL=1
+      - FLEET_ENROLLMENT_TOKEN=${FLEET_ENROLLMENT_TOKEN}
+      - FLEET_URL=https://elastic-agent:8220
+      - FLEET_FORCE=1
+      # Needed to allow self-signed certificate. Otherwise 'x509: certificate signed by unknown authority' will appear.
+      - FLEET_INSECURE=1
+    ports:
+      - 8220:8220
+    healthcheck:
+      test: "elastic-agent status"
+      retries: 90
+      interval: 1s
+    networks:
+      - fleet-external
+    secrets:
+      - fleet-server.crt
+      - fleet-server.key
+      - fleet-server-passphrase
+    volumes:
+      - certs:/usr/share/elastic-agent/config/certs
+      # TODO: Mount logstash logs
+    logging:
+      driver: "json-file"
+      options:
+          max-file: 5
+          max-size: 50m
+
+volumes:
+  certs:
+    driver: local
+
+networks:
+  fleet-external:
+    external: true
+
+secrets:
+  fleet-server.crt:
+    file: .certs/fleet-server-cert.pem
+  fleet-server.key:
+    file: .certs/fleet-server-key.pem
+  fleet-server-passphrase:
+    file: .certs/fleet-server-passphrase.txt

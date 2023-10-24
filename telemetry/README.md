@@ -16,6 +16,8 @@ Elastic agent is installed at '/opt/Elastic/Agent' by default and should be run 
 
 ### Kibana configuration
 Add token and tls certificate + key for tls which you can find in the apm-server.yml.
+Example token: AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2OTMxNDgwMjE4MjY6QUE4Z3RsVVhSUFNRelp5VHdQcm91dw
+After successful APM integration you should see the "no longer blocking ingestion as all precondition checks are now satisfied" log from the APM server instance.
 
 ## Pre requisites
 ### Prepare Linux
@@ -45,6 +47,13 @@ Execute the command below using Ubuntu terminal from the 'otel-collector' folder
 ```bash
 sudo service docker start
 cd /mnt/c/MyProjects/elk/telemetry && sudo docker compose up
+```
+
+## Run FLeet Server + Fleet Agent
+When ELK stack is running, run Fleet stack.
+```bash
+sudo docker network create fleet-external
+sudo docker compose -f docker-compose-fleet-server-agent.yml up
 ```
 
 ### Access Kibana

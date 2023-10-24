@@ -234,7 +234,7 @@ apm-server:
 
     # Optional protocol and basic auth credentials.
     # protocol: "https"
-    protocol: "http"
+    protocol: "https"
     username: "elastic"
     password: "${ELASTIC_PASSWORD}"
 
@@ -245,7 +245,7 @@ apm-server:
     #path: ""
 
     # Enable custom SSL settings. Set to false to ignore custom SSL settings for secure communication.
-    #ssl.enabled: true
+    ssl.enabled: true
 
     # Optional SSL configuration options. SSL is off by default, change the `protocol` option if you want to enable `https`. 
     #
@@ -268,16 +268,16 @@ apm-server:
 
     # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
     # 1.2 are enabled.
-    #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+    ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
     # List of root certificates for HTTPS server verifications.
-    #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+    ssl.certificate_authorities: ["/config/certs/ca/ca.crt"]
 
     # Certificate for SSL client authentication.
-    #ssl.certificate: "/etc/pki/client/cert.pem"
+    ssl.certificate: "/run/secrets/kibana.crt"
 
     # Client Certificate Key
-    #ssl.key: "/etc/pki/client/cert.key"
+    ssl.key: "/run/secrets/kibana.key"
 
     # Optional passphrase for decrypting the Certificate Key.
     # It is recommended to use the provided keystore instead of entering the passphrase in plain text.
@@ -356,7 +356,7 @@ output.elasticsearch:
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
   # dropped. The default is 3.
-  max_retries: 3
+  max_retries: 5
 
   # The number of seconds to wait before trying to reconnect to Elasticsearch
   # after a network error. After waiting backoff.init seconds, apm-server
@@ -784,12 +784,12 @@ output.elasticsearch:
 
 # Sets the minimum log level. The default log level is info.
 # Available log levels are: error, warning, info, or debug.
-#logging.level: info
+logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"].
 # Other available selectors are "beat", "publish", or "service".
 # Multiple selectors can be chained.
-#logging.selectors: [ ]
+logging.selectors: ["*"]
 
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true
@@ -805,25 +805,25 @@ output.elasticsearch:
 
 # Logging to rotating files. When true, writes all logging output to files.
 # The log files are automatically rotated when the log file size limit is reached.
-#logging.to_files: true
-#logging.files:
+logging.to_files: true
+logging.files:
   # Configure the path where the logs are written. The default is the logs directory
   # under the home path (the binary location).
-  #path: /var/log/apm-server
+  path: /var/log/apm-server
 
   # The name of the files where the logs are written to.
-  #name: apm-server
+  name: apm-server
 
   # Configure log file size limit. If limit is reached, log file will be
   # automatically rotated.
-  #rotateeverybytes: 10485760 # = 10MB
+  rotateeverybytes: 10485760 # = 10MB
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
-  #keepfiles: 7
+  keepfiles: 7
 
   # The permissions mask to apply when rotating log files. The default value is 0600.
   # Must be a valid Unix-style file permissions mask expressed in octal notation.
-  #permissions: 0600
+  permissions: 0600
 
   # Enable log file rotation on time intervals in addition to size-based rotation.
   # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
