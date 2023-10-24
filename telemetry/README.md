@@ -7,6 +7,8 @@
 Please remember that OpenTelemetry doesn't store any data (traces, metrics, logs). It has concept of exporters, where data are exported to user selected data (trace, metric, log) storage (3rd party). 
 OpenTelemetry is "middle layer", where you can switch to another storage easily.
 
+[Avaliable features list for used license](https://www.elastic.co/subscriptions).
+
 ## APM server
 Elastic agent is installed at '/opt/Elastic/Agent' by default and should be run as a service.
 
@@ -25,6 +27,17 @@ sudo sysctl -w vm.max_map_count=262144
 Whenever it is needed :)
 ```bash
 ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1
+```
+
+## Docker helpers
+Stop all containers
+```bash
+docker stop $(docker ps -a -q)
+```
+
+Remove all volumes
+```bash
+docker volume rm $(docker volume ls -q)
 ```
 
 ## Run Collector + Jaeger docker container + ELK

@@ -144,134 +144,36 @@ services:
       timeout: 10s
       retries: 120
 
-  filebeat:
-    container_name: filebeat
-    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+  elastic-apm:
+    container_name: elastic-apm
+    image: docker.elastic.co/apm/apm-server:${STACK_VERSION}
     restart: always
     depends_on:
-      logstash:
+      elasticsearch:
         condition: service_healthy
-    # Need to override user so we can access the log files, and docker.sock
+      kibana:
+        condition: service_healthy
+    ports:
+      - 8200:8200
     user: root
+    volumes:
+      - ./apm-server/apm-server.yml:/usr/share/apm-server/apm-server.yml:rw
+      - certs:/usr/share/apm-server/config/certs
+      - ./logs:/var/log/elastic-apm.log
+    environment:
+      - APM_TOKEN=${APM_TOKEN}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    healthcheck:
+      interval: 10s
+      retries: 12
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
     networks:
       - telemetry
-    volumes:
-      - filebeatdata:/usr/share/filebeat/data
-      - /var/run/docker.sock:/var/run/docker.sock
-      # This is needed for filebeat to load container log path as specified in filebeat.yml
-      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
-      # This is needed for filebeat to load logs for system and auth modules
-      - /var/log/:/var/log/:ro
-      # This is needed for filebeat to load logs for auditd module. you might have to install audit system
-      # on ubuntu first (sudo apt-get install -y auditd audispd-plugins)
-      - /var/log/audit/:/var/log/audit/:ro
-      - type: bind
-        source: ./beats/config/filebeat.yml
-        target: /usr/share/filebeat/filebeat.yml
-    environment:
-      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-Password123++}
-    # disable strict permission checks
-    command: ["--strict.perms=false"]
-
-  # auditbeat:
-  #   image: docker.elastic.co/beats/auditbeat:${STACK_VERSION}
-  #   # Need to override user so we can access the log files, and docker.sock
-  #   user: root
-  #   cap_add:
-  #     - AUDIT_CONTROL
-  #     - AUDIT_READ
-  #   networks:
-  #     - telemetry
-  #   volumes:
-  #     - auditbeatdata:/usr/share/auditbeat/data
-  #     - /var/log:/var/log:ro
-  #     # - type: bind
-  #     #   source: ./beats/config/auditbeat.yml
-  #     #   target: /usr/share/auditbeat/auditbeat.yml
-  #   environment:
-  #     - ELASTICSEARCH_HOST=https://elasticsearch:9200
-  #     - KIBANA_HOST=http://kibana:5601
-  #     - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
-  #     - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-Password123++}
-  #   command: ["--strict.perms=false"]
-
-  # elastic-apm:
-  #   container_name: elastic-apm
-  #   image: docker.elastic.co/apm/apm-server:${STACK_VERSION}
-  #   restart: always
-  #   depends_on:
-  #     elasticsearch:
-  #       condition: service_healthy
-  #     kibana:
-  #       condition: service_healthy
-  #   ports:
-  #     - 8200:8200
-  #   user: root
-  #   volumes:
-  #     - ./apm-server/apm-server.yml:/usr/share/apm-server/apm-server.yml:rw
-  #     - certs:/usr/share/apm-server/config/certs
-  #     - ./logs:/var/log/elastic-apm.log
-  #   environment:
-  #     - APM_TOKEN=${APM_TOKEN}
-  #     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-  #   healthcheck:
-  #     interval: 10s
-  #     retries: 12
-  #     test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
-  #   networks:
-  #     - telemetry
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #         max-file: 6
-  #         max-size: 500m
-
-  # otel-collector:
-  #   container_name: otel-collector
-  #   restart: always
-  #   depends_on:
-  #     elasticsearch:
-  #       condition: service_healthy
-  #   image: otel/opentelemetry-collector-contrib:0.84.0
-  #   volumes:
-  #     - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
-  #     - ./logs:/var/log/otel-collector.log
-  #   environment:
-  #     - APM_TOKEN=${APM_TOKEN}
-  #   networks:
-  #     - telemetry
-  #   ports:
-  #     - 1888:1888 # pprof extension
-  #     - 8888:8888 # Prometheus metrics exposed by the collector
-  #     - 8889:8889 # Prometheus exporter metrics
-  #     - 13133:13133 # health_check extension
-  #     - 4317:4317 # OTLP gRPC receiver
-  #     - 4318:4318 # OTLP http receiver
-  #     - 55679:55679 # zpages extension
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #         max-file: 5
-  #         max-size: 100m
-      
-  # jaeger:
-  #   container_name: jaeger-all-in-one
-  #   restart: always
-  #   image: jaegertracing/all-in-one:latest
-  #   environment:
-  #     COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
-  #   ports:
-  #     - "5775:5775/udp"
-  #     - "6831:6831/udp"
-  #     - "6832:6832/udp"
-  #     - "5778:5778"
-  #     - "16686:16686"
-  #     - "14268:14268"
-  #     - "14250:14250"
-  #     - "9411:9411"
-  #   networks:
-  #     - telemetry
+    logging:
+      driver: "json-file"
+      options:
+          max-file: 6
+          max-size: 500m
 
 volumes:
   certs:
