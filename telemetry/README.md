@@ -58,23 +58,3 @@ sudo docker compose -f docker-compose-fleet-server-agent.yml up
 
 ### Access Kibana
 http://localhost:5601/
-
-### Access Jaeger
-http://localhost:16686/
-
-### ZPages for quick collector overview
-http://localhost:55679/debug/servicez
-
-## Beats
-### Filebeat
-#### syslog module
-
-Ensure that 'syslog' service installed
-```bash
-sudo apt-get install --reinstall rsyslog
-```
-
-Ensure that 'syslog' service is up and running
-```bash
-sudo service rsyslog start
-```
