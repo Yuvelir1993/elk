@@ -26,18 +26,23 @@ sudo sysctl -w vm.max_map_count=262144
 ```
 
 ### Get ETH 0 IP
-Whenever it is needed :)
+**Whenever it is needed :)**
 ```bash
 ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1
 ```
 
 ## Docker helpers
-Stop all containers
+**Stop all containers.**
 ```bash
 docker stop $(docker ps -a -q)
 ```
 
-Remove all volumes
+**Remove all containers.**
+```bash
+docker container rm $(docker ps -a -q)
+```
+
+**Remove all volumes.**
 ```bash
 docker volume rm $(docker volume ls -q)
 ```
@@ -50,10 +55,21 @@ cd /mnt/c/MyProjects/elk/telemetry && sudo docker compose up
 ```
 
 ## Run FLeet Server + Fleet Agent
-When ELK stack is running, run Fleet stack.
+When ELK stack is running, run Fleet agen acting also as a server.
 ```bash
 sudo docker network create fleet-external
-sudo docker compose -f docker-compose-fleet-server-agent.yml up
+cd /mnt/c/MyProjects/elk/telemetry && sudo docker compose -f docker-compose-fleet-server-agent.yml up
+```
+
+**Get aware of the Elastic Agent container commands.**
+```bash
+docker run --rm docker.elastic.co/beats/elastic-agent:8.10.4 elastic-agent container -h
+```
+
+## Run fluentbit
+Use [Calyptia](https://cloud.calyptia.com/) to visualize and test your configs.
+```bash
+cd /mnt/c/MyProjects/elk/telemetry && sudo docker compose -f docker-compose-fluentbit.yml up
 ```
 
 ### Access Kibana
