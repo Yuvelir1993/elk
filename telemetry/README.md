@@ -47,6 +47,11 @@ docker container rm $(docker ps -a -q)
 docker volume rm $(docker volume ls -q)
 ```
 
+**Stop + remopve all-in-one**
+```bash
+docker stop $(docker ps -a -q) && docker container rm $(docker ps -a -q) && docker volume rm $(docker volume ls -q)
+```
+
 ## Run Collector + Jaeger docker container + ELK
 Execute the command below using Ubuntu terminal from the 'otel-collector' folder.
 ```bash
@@ -55,10 +60,11 @@ cd /mnt/c/MyProjects/elk/telemetry && sudo docker compose up
 ```
 
 ## Run FLeet Server + Fleet Agent
-When ELK stack is running, run Fleet agen acting also as a server.
+When ELK stack is running, run Fleet agent acting as a server and the agent itself.
 ```bash
 sudo docker network create fleet-external
-cd /mnt/c/MyProjects/elk/telemetry && sudo docker compose -f docker-compose-fleet-server-agent.yml up
+cd /mnt/c/MyProjects/elk/telemetry && sudo docker compose -f docker-compose-fleet-server.yml up
+cd /mnt/c/MyProjects/elk/telemetry && sudo docker compose -f docker-compose-fleet-agent.yml up
 ```
 
 **Get aware of the Elastic Agent container commands.**

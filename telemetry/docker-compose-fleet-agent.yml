@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  elastic-agent:
+    container_name: elastic-agent
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+    restart: always
+    user: root
+    environment:
+      - ELASTICSEARCH_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
+      - ELASTICSEARCH_HOST=https://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+      # - KIBANA_HOST=http://kibana:5601
+      # - KIBANA_USERNAME=elastic
+      # - KIBANA_PASSWORD=${ELASTIC_PASSWORD}
+      # - KIBANA_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
+      # - KIBANA_FLEET_HOST=http://kibana:5601
+      # - KIBANA_FLEET_USERNAME=elastic
+      # - KIBANA_FLEET_PASSWORD=${ELASTIC_PASSWORD}
+      - FLEET_SERVER_ENABLE=false
+      # - FLEET_SERVER_ELASTICSEARCH_HOST=https://elasticsearch:9200
+      # - FLEET_SERVER_ELASTICSEARCH_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
+      - FLEET_SERVER_SERVICE_TOKEN=${FLEET_SERVER_SERVICE_TOKEN}
+      - FLEET_SERVER_POLICY_ID=${FLEET_SERVER_POLICY_ID}
+      - FLEET_SERVER_HOST=elastic-agent-server
+      - FLEET_SERVER_PORT=8220
+      # - FLEET_SERVER_CERT=/run/secrets/fleet-server.crt
+      # - FLEET_SERVER_CERT_KEY=/run/secrets/fleet-server.key
+      # - FLEET_SERVER_CERT_KEY_PASSPHRASE=/run/secrets/fleet-server-passphrase
+
+      - ELASTIC_AGENT_TAGS=elastic-agent
+      - FLEET_ENROLL=1
+      - FLEET_ENROLLMENT_TOKEN=${FLEET_ENROLLMENT_TOKEN}
+      - FLEET_URL=https://elastic-agent-server:8220
+      - FLEET_FORCE=1
+      # Needed to allow self-signed certificate. Otherwise 'x509: certificate signed by unknown authority' will appear.
+      - FLEET_INSECURE=1
+    # ports:
+    #   - 8220:8220
+    healthcheck:
+      test: "elastic-agent status"
+      retries: 90
+      interval: 1s
+    networks:
+      - fleet-external
+    secrets:
+      - fleet-server.crt
+      - fleet-server.key
+      - fleet-server-passphrase
+    volumes:
+      - certs:/usr/share/elastic-agent/config/certs
+      - type: bind
+        source: ./elastic-agent/elastic-agent.yml
+        target: /usr/share/elastic-agent/elastic-agent.yml
+      # TODO: mount naother logs sources to use agent like filebeat
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: ${ETH0_IP}:24224
+        tag: elastic-agent.log
+
+volumes:
+  certs:
+    driver: local
+
+networks:
+  fleet-external:
+    external: true
+
+secrets:
+  fleet-server.crt:
+    file: .certs/fleet-server-cert.pem
+  fleet-server.key:
+    file: .certs/fleet-server-key.pem
+  fleet-server-passphrase:
+    file: .certs/fleet-server-passphrase.txt

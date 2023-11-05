@@ -7,28 +7,28 @@ outputs:
     username: '${ELASTICSEARCH_USERNAME:elastic}'
     password: '${ELASTICSEARCH_PASSWORD:Password123++}'
 
-# inputs:
-#   - type: system/metrics
-#     # Each input must have a unique ID.
-#     id: unique-system-metrics-input
-#     # Namespace name must conform to the naming conventions for Elasticsearch indices, cannot contain dashes (-), and cannot exceed 100 bytes
-#     # For index naming restrictions, see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params
-#     data_stream.namespace: default
-#     use_output: default
-#     streams:
-#       - metricsets:
-#         - cpu
-#         # Dataset name must conform to the naming conventions for Elasticsearch indices, cannot contain dashes (-), and cannot exceed 100 bytes
-#         data_stream.dataset: system.cpu
-#       - metricsets:
-#         - memory
-#         data_stream.dataset: system.memory
-#       - metricsets:
-#         - network
-#         data_stream.dataset: system.network
-#       - metricsets:
-#         - filesystem
-#         data_stream.dataset: system.filesystem
+inputs:
+  - type: system/metrics
+    # Each input must have a unique ID.
+    id: unique-system-metrics-input
+    # Namespace name must conform to the naming conventions for Elasticsearch indices, cannot contain dashes (-), and cannot exceed 100 bytes
+    # For index naming restrictions, see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params
+    data_stream.namespace: default
+    use_output: default
+    streams:
+      - metricsets:
+        - cpu
+        # Dataset name must conform to the naming conventions for Elasticsearch indices, cannot contain dashes (-), and cannot exceed 100 bytes
+        data_stream.dataset: system.cpu
+      - metricsets:
+        - memory
+        data_stream.dataset: system.memory
+      - metricsets:
+        - network
+        data_stream.dataset: system.network
+      - metricsets:
+        - filesystem
+        data_stream.dataset: system.filesystem
 
 #   # Collecting log files
 #   - type: filestream
