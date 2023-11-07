@@ -1,2 +1,3 @@
 log.level: info
+pipeline.separate_logs: true
 xpack.monitoring.enabled: false
