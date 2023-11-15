@@ -69,7 +69,7 @@ cd /mnt/c/MyProjects/elk/telemetry && sudo docker compose -f docker-compose-flee
 
 **Get aware of the Elastic Agent container commands.**
 ```bash
-docker run --rm docker.elastic.co/beats/elastic-agent:8.10.4 elastic-agent container -h
+docker run --rm docker.elastic.co/beats/elastic-agent:8.11.1 elastic-agent container -h
 ```
 
 ## Run fluentbit
