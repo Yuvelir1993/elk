@@ -3,7 +3,7 @@ version: '3.8'
 services:
   fluent-bit:
     container_name: fluent-bit
-    image: fluent/fluent-bit:2.1.10-debug
+    image: fluent/fluent-bit:2.2.0-debug
     user: root
     volumes:
       - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
